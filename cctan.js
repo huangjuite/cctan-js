@@ -5,10 +5,27 @@ var object_n = 0;
 var objects = [];
 var rect = canvas.getBoundingClientRect();
 var angle = 0;
-var elephant = new Image();
-elephant.src = "elephant.png";
+var shoot = false;
+var icon = new Image();
+var icon_zoom = 1;
+icon.src = "elephant.png";
 
 document.addEventListener("mousemove", mouseMove);
+document.addEventListener("mousedown", mouseDown);
+document.addEventListener("mouseup", mouseUp);
+
+function mouseMove(e) {
+  let mx = e.clientX - canvas.width / 2 - rect.left;
+  let my = e.clientY - canvas.height / 2 - rect.top;
+  angle = Math.atan2(my, mx);
+}
+
+function mouseDown(e) {
+  shoot = true;
+}
+function mouseUp(e) {
+  shoot = false;
+}
 
 function setup() {
   // for (let i = 0; i < 10; i++) {
@@ -29,17 +46,11 @@ function setup() {
   // }
 }
 
-function mouseMove(e) {
-  let mx = e.clientX - canvas.width / 2 - rect.left;
-  let my = e.clientY - canvas.height / 2 - rect.top;
-  angle = Math.atan2(my, mx);
-}
-
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // shoot balls
-  if (frame % 5 == 0) {
+  if (frame % 5 == 0 && shoot) {
     objects.push(
       new Ball(
         object_n,
@@ -54,14 +65,16 @@ function render() {
     object_n += 1;
   }
 
-  // draw elephant
+  // draw icon
   ctx.save();
   ctx.translate(canvas.width / 2, canvas.height / 2);
   ctx.rotate(angle - Math.PI / 2);
   ctx.drawImage(
-    elephant,
-    -elephant.naturalWidth / 2,
-    -elephant.naturalHeight / 2
+    icon,
+    (-icon.naturalWidth * icon_zoom) / 2,
+    (-icon.naturalHeight * icon_zoom) / 2,
+    icon.naturalWidth * icon_zoom,
+    icon.naturalHeight * icon_zoom
   );
   ctx.restore();
 
@@ -85,7 +98,7 @@ function render() {
       objects[i] = null;
       objects.splice(i, 1);
       i--;
-      console.log('remove ball', i)
+      console.log("remove ball", i);
     }
   }
 
