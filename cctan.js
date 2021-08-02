@@ -8,6 +8,10 @@ var angle = 0;
 var shoot = false;
 var icon = new Image();
 var icon_zoom = 1;
+
+var brick_circle_n = 0;
+var brick_circles = [];
+
 icon.src = "elephant.png";
 
 document.addEventListener("mousemove", mouseMove);
@@ -64,7 +68,45 @@ function render() {
     );
     object_n += 1;
   }
-
+  
+  //create objC
+  if(frame % 20 == 0){
+    let initional_x, initional_y;
+    let state = Math.floor(Math.random() * 4);
+    switch (state){
+      case 0: //come from up
+        initional_x = Math.floor(Math.random() * canvas.width);
+        initional_y = 0;
+        break;
+      case 1: //come from down
+        initional_x = Math.floor(Math.random() * canvas.width);
+        initional_y = canvas.height;
+        break;
+      case 2: //come from left
+        initional_x = 0;
+        initional_y = Math.floor(Math.random() * canvas.height);
+        break;
+      case 3: //come from right
+        initional_x = canvas.width;
+        initional_y = Math.floor(Math.random() * canvas.height);
+        break; 
+    }
+    let direction_angle = Math.atan2(initional_y - canvas.height / 2, initional_x - canvas.width / 2);
+    //let cir = new Objc(brick_circle_n,initional_x,initional_y,Math.cos(direction_angle) * 2,Math.sin(direction_angle) * 2,canvas,ctx);
+    brick_circles.push(
+      new Objc(
+        brick_circle_n,
+        initional_x,
+        initional_y,
+        Math.cos(direction_angle) * 2,
+        Math.sin(direction_angle) * 2,
+        canvas,
+        ctx
+      )
+    );
+    brick_circle_n += 1;
+  }
+  
   // draw icon
   ctx.save();
   ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -79,10 +121,14 @@ function render() {
   ctx.restore();
 
   objects.forEach(function (b) {
-    b.checkCollision();
+      b.checkCollision();
   });
 
   objects.forEach(async function (b) {
+    b.draw();
+  });
+
+  brick_circles.forEach(async function (b) {
     b.draw();
   });
 
@@ -99,6 +145,17 @@ function render() {
       objects.splice(i, 1);
       i--;
       console.log("remove ball", i);
+    }
+  }
+
+  // remove bricks
+  for (let i = 0; i < brick_circles.length; i++) {
+    var b = brick_circles[i];
+    if (b.checkCenterCollision()) {
+      brick_circles[i] = null;
+      brick_circles.splice(i, 1);
+      i--;
+      console.log("remove bricks", i);
     }
   }
 

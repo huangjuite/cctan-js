@@ -22,6 +22,10 @@ class Ball {
     let dist = this.ballDist(obj);
   }
 
+  getType(obj){
+    return obj.type;
+  }
+
   checkCollision() {
     // for (let i = 0; i < objects.length; i++) {
     //   let obj = objects[i];
